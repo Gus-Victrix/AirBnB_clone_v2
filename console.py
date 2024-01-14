@@ -1,19 +1,52 @@
 #!/usr/bin/python3
-""" Console Module """
-import cmd
-import sys
-from models.base_model import BaseModel
-from models.__init__ import storage
-from models.user import User
-from models.place import Place
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.review import Review
+"""
+This module contains the entry point of the command interpreter.
+It defines the Console class, which contains the functionality for the
+HBNB console.
+
+Usage: ./console.py (interactive mode)
+       ./console.py <command> (one time execution mode)
+
+Classes:
+    HBNBCommand - contains the functionality for the HBNB console
+
+Dependencies:
+    cmd - implements the command line interpreter
+    sys - provides access to some variables used or maintained by the
+          interpreter and to functions that interact strongly with the
+          interpreter
+    models.base_model - defines all common attributes/methods for other
+                        classes
+    models.__init__ - initializes a storage engine
+    models.user - defines attributes/methods for the User class
+    models.place - defines attributes/methods for the Place class
+    models.state - defines attributes/methods for the State class
+    models.city - defines attributes/methods for the City class
+    models.amenity - defines attributes/methods for the Amenity class
+    models.review - defines attributes/methods for the Review class
+"""
+import cmd  # Availing most of the functionality for the console
+import sys  # Availing the isatty() method to determine interactive mode
+from models.base_model import BaseModel  # Availing the BaseModel class
+from models.__init__ import storage  # Availing the storage engine
+from models.user import User # Availing the User class
+from models.place import Place # Availing the Place class
+from models.state import State # Availing the State class
+from models.city import City  # Availing the City class
+from models.amenity import Amenity  # Availing the Amenity class
+from models.review import Review  # Availing the Review class
 
 
-class HBNBCommand(cmd.Cmd):
-    """ Contains the functionality for the HBNB console"""
+class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
+    """
+    Fully functional command interpreter for the HBNB project.
+
+    Attributes:
+        prompt - determines prompt for interactive/non-interactive modes
+        classes - dictionary of classes available for use in console
+        dot_cmds - list of commands that use dot notation
+        types - dictionary of types for dot notation commands
+    """
 
     # determines prompt for interactive/non-interactive modes
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
