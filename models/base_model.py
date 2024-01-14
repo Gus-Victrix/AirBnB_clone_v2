@@ -65,9 +65,15 @@ class BaseModel:
             self.__dict__.update(kwargs)
 
     def __str__(self):
-        """Returns a string representation of the instance"""
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+        """
+        Creates an unofficial string representation of instance.
+        Format:
+            [<class name>] (<self.id>) <self.__dict__>
+
+        Returns:
+            Unofficial string representation of instance.
+        """
+        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def save(self):
         """Updates updated_at with current time when instance is changed"""
