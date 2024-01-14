@@ -9,7 +9,7 @@ Dependencies:
     models - module containing all classes
 """
 import models
-import uuid
+from uuid import uuid4
 from datetime import datetime
 
 
@@ -39,11 +39,12 @@ class BaseModel:
             created_at - time instance was created
             updated_at - time instance was updated
         """
+        current_time = datetime.now()  # Taking time-stamp for consistency.
         if len(kwargs) == 0:  # If no kwargs were passsed.
             from models import storage
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
+            self.id = str(uuid4())
+            self.created_at = current_time
+            self.updated_at = current_time
             storage.new(self)
         else:
             if 'updated_at' in kwargs:
@@ -51,14 +52,14 @@ class BaseModel:
                         kwargs['updated_at'],
                         '%Y-%m-%dT%H:%M:%S.%f')
             else:
-                kwargs['updated_at'] = datetime.now()
+                kwargs['updated_at'] = current_time
 
             if 'created_at' in kwargs:
                 kwargs['created_at'] = datetime.strptime(
                         kwargs['created_at'],
                         '%Y-%m-%dT%H:%M:%S.%f')
             else:
-                kwargs['created_at'] = datetime.now()
+                kwargs['created_at'] = current_time
 
             del kwargs['__class__']
             self.__dict__.update(kwargs)
