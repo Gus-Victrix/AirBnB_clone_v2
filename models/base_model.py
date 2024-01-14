@@ -4,7 +4,7 @@ BaseModel class for AirBnB clone project - part of the console.
 This provides the basic functionality for all other classes.
 
 Dependencies:
-    uuid - generates unique id's for each instance
+    uuid4 - generates unique id's for each instance
     datetime - provides date and time information
     models - module containing all classes
 """
@@ -41,28 +41,19 @@ class BaseModel:
         """
         current_time = datetime.now()  # Taking time-stamp for consistency.
         if len(kwargs) == 0:  # If no kwargs were passsed.
-            from models import storage
-            self.id = str(uuid4())
+            from models import storage  # For storing new instance.
+            self.id = str(uuid4())  # Generating unique id.
             self.created_at = current_time
             self.updated_at = current_time
             storage.new(self)
         else:
-            if 'updated_at' in kwargs:
-                kwargs['updated_at'] = datetime.strptime(
-                        kwargs['updated_at'],
-                        '%Y-%m-%dT%H:%M:%S.%f')
-            else:
-                kwargs['updated_at'] = current_time
-
-            if 'created_at' in kwargs:
-                kwargs['created_at'] = datetime.strptime(
-                        kwargs['created_at'],
-                        '%Y-%m-%dT%H:%M:%S.%f')
-            else:
-                kwargs['created_at'] = current_time
-
-            del kwargs['__class__']
-            self.__dict__.update(kwargs)
+            for key, value in kwargs.items():  # Iterating through kwargs.
+                if key != '__class__':  # Ignoring class name.
+                    # Setting anything that isn't a datetime object.
+                    if key != 'created_at' and key != 'updated_at':
+                        setattr(self, key, value)
+                    else:  # Setting datetime objects.
+                        setattr(self, key, datetime.isoformat(value))
 
     def __str__(self):
         """
@@ -76,17 +67,28 @@ class BaseModel:
         return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def save(self):
-        """Updates updated_at with current time when instance is changed"""
+        """
+        Updates updated_at with current time when instance is changed.
+        """
         from models import storage
         self.updated_at = datetime.now()
         storage.save()
 
     def to_dict(self):
-        """Convert instance into dict format"""
-        dictionary = {}
-        dictionary.update(self.__dict__)
-        dictionary.update({'__class__':
-                          (str(type(self)).split('.')[-1]).split('\'')[0]})
-        dictionary['created_at'] = self.created_at.isoformat()
-        dictionary['updated_at'] = self.updated_at.isoformat()
+        """
+        Converts instance into dict format.
+        Format: {
+            '__class__': <class name>
+            'created_at': <self.created_at.isoformat()>
+            'updated_at': <self.updated_at.isoformat()>
+            }
+
+        Returns:
+            Dictionary representation of instance.
+        """
+        dictionary = self.__dict__.copy()  # Copying to avoid overwriting.
+        # Converting datetime objects to isoformat.
+        dictionary['created_at'] = dictionary.['created_at'].isoformat()
+        dictionary['updated_at'] = dictionary.['updated_at'].isoformat()
+        dictionary['__class__'] = self.__class__.__name__  # Adding class name.
         return dictionary
