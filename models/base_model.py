@@ -1,14 +1,45 @@
 #!/usr/bin/python3
-"""This module defines a base class for all models in our hbnb clone"""
+"""
+BaseModel class for AirBnB clone project - part of the console.
+This provides the basic functionality for all other classes.
+
+Dependencies:
+    uuid - generates unique id's for each instance
+    datetime - provides date and time information
+    models - module containing all classes
+"""
+import models
 import uuid
 from datetime import datetime
 
 
 class BaseModel:
-    """A base class for all hbnb models"""
+    """
+    Base Class for basic functionality for all classes.
+    
+    Attributes:
+        id - unique id for each instance
+        created_at - time instance was created
+        updated_at - time instance was updated
+
+    Methods:
+        __init__ - instantiates a new model
+        __str__ - returns a string representation of the instance
+        save - updates updated_at with current time when instance is changed
+        to_dict - converts instance into dict format
+    """
     def __init__(self, *args, **kwargs):
-        """Instatntiates a new model"""
-        if not kwargs:
+        """
+        Instantiates a new BaseModel.
+        If kwargs are given, instance is set to values in kwargs.
+        Otherwise, a new instance is created with new id and created_at time.
+        
+        Kwargs:
+            id - unique id for each instance
+            created_at - time instance was created
+            updated_at - time instance was updated
+        """
+        if len(kwargs) == 0:  # If no kwargs were passsed.
             from models import storage
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
