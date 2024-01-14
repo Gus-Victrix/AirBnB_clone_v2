@@ -159,7 +159,7 @@ class HBNBCommand(cmd.Cmd):
                 return int(value)
             except ValueError:
                 return None
-        """
+            """
     def help_create(self):
         """ Help information for the create method """
         print("Creates a class of any type")
