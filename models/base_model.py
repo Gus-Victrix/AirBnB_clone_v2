@@ -16,12 +16,16 @@ class BaseModel:
             storage.new(self)
         else:
             if 'updated_at' in kwargs:
-                kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'], '%Y-%m-%dT%H:%M:%S.%f')
+                kwargs['updated_at'] = datetime.strptime(
+                        kwargs['updated_at'],
+                        '%Y-%m-%dT%H:%M:%S.%f')
             else:
                 kwargs['updated_at'] = datetime.now()
 
             if 'created_at' in kwargs:
-                kwargs['created_at'] = datetime.strptime(kwargs['created_at'], '%Y-%m-%dT%H:%M:%S.%f')
+                kwargs['created_at'] = datetime.strptime(
+                        kwargs['created_at'],
+                        '%Y-%m-%dT%H:%M:%S.%f')
             else:
                 kwargs['created_at'] = datetime.now()
 

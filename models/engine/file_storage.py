@@ -9,9 +9,13 @@ class FileStorage:
     __objects = {}
 
     def all(self, cls=None):
-        """Returns a dictionary or a filtered dictionary of models currently in storage"""
+        """
+        Return all currently stored objects in a dictionary.
+        If a class is specified, return only objects of that class.
+        """
         if cls:
-            return {key: obj for key, obj in FileStorage.__objects.items() if isinstance(obj, cls)}
+            return {key: obj for key, obj in
+                    FileStorage.__objects.items() if isinstance(obj, cls)}
         return FileStorage.__objects
 
     def new(self, obj):
@@ -22,7 +26,8 @@ class FileStorage:
     def save(self):
         """Saves storage dictionary to file"""
         with open(FileStorage.__file_path, 'w') as f:
-            temp = {key: obj.to_dict() for key, obj in FileStorage.__objects.items()}
+            temp = {key: obj.to_dict() for key, obj in
+                    FileStorage.__objects.items()}
             json.dump(temp, f)
 
     def reload(self):
