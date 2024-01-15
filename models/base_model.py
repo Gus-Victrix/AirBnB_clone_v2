@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-BaseModel class for AirBnB clone project - part of the console.
+This module creates BaseModel class for AirBnB clone project.
 This provides the basic functionality for all other classes.
 
 Dependencies:
