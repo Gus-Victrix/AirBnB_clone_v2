@@ -25,6 +25,8 @@ Dependencies:
     models.amenity - defines attributes/methods for the Amenity class
     models.review - defines attributes/methods for the Review class
 """
+import re  # Availing regular expression functionality
+import shlex  # Availing lexical analysis functionality
 import cmd  # Availing most of the functionality for the console
 import sys  # Availing the isatty() method to determine interactive mode
 from models.base_model import BaseModel  # Availing the BaseModel class
@@ -70,83 +72,77 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         do_update - updates a certain object with new info
         help_update - help information for the update class
     """
-
-    # determines prompt for interactive/non-interactive modes
-    prompt = '(hbnb)' if sys.__stdin__.isatty() else ''
+    prompt = '(hbnb)'  # Set prompt to be used by Cmd
 
     classes = {
                'BaseModel': BaseModel, 'User': User, 'Place': Place,
                'State': State, 'City': City, 'Amenity': Amenity,
                'Review': Review
               }
-    dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
              'number_rooms': int, 'number_bathrooms': int,
              'max_guest': int, 'price_by_night': int,
              'latitude': float, 'longitude': float
             }
 
-    def preloop(self):
-        """Prints if isatty is false"""
-        if not sys.__stdin__.isatty():
-            print('(hbnb)')
-
-    def precmd(self, line):
-        """Reformat command line for advanced command syntax.
+    def default(self, line):
+        """
+        Handles advanced command syntax.
+        It is executed when a command is not recognized.
 
         Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
         (Brackets denote optional fields in usage example.)
+        The following commands are supported:
+            <class name>.all()
+            <class name>.count()
+            <class name>.create()
+            <class name>.show(<id>)
+            <class name>.destroy(<id>)
+            <class name>.update(<id>, <attribute name>, <attribute value>)
+            <class name>.update(<id>, <dictionary representation>)
         """
-        _cmd = _cls = _id = _args = ''  # initialize line elements
+        functions = {
+                "all": self.do_all,
+                "count": self.do_count,
+                "create": self.do_create,
+                "show": self.do_show,
+                "destroy": self.do_destroy,
+                "update": self.do_update
+                }
+        regex = r"(.*)\.(.*)\((.*)\)"  # Matches <class>.<command>(<id>)
+        if re.search(regex, line):  # If line matches regex
+            inputs = re.sub(regex, r"\2 \1 \3", line)  # Rearrange to normal
+            inputs = shlex.split(inputs)  # Split into list respecting quotes
+            if inputs[0] in functions.keys():  # If command is supported
+                # The update is a special case, so it is handled separately
+                if inputs[0] == "update" and '{' in line and '}' in line:
+                    self.dict_update(inputs[1], line)
+                else: # Otherwise, execute the command
+                    functions[inputs[0]](' '.join(inputs[1:]))  # Execute
+            else:  # If command is not supported
+                print(f"*** Unknown syntax: {line}")
+        else:  # If line does not match regex
+            print(f"*** Unknown syntax: {line}")
 
-        # scan for general formating - i.e '.', '(', ')'
-        if not ('.' in line and '(' in line and ')' in line):
-            return line
 
-        try:  # parse line left to right
-            pline = line[:]  # parsed line
 
-            # isolate <class name>
-            _cls = pline[:pline.find('.')]
+    def dict_update(self, classname, line):
+        '''
+        Performs the update method on an item passed with a dictionary
+            of attribute/value pairs.
 
-            # isolate and validate <command>
-            _cmd = pline[pline.find('.') + 1:pline.find('(')]
-            if _cmd not in HBNBCommand.dot_cmds:
-                raise Exception
-
-            # if parantheses contain arguments, parse them
-            pline = pline[pline.find('(') + 1:pline.find(')')]
-            if pline:
-                # partition args: (<id>, [<delim>], [<*args>])
-                pline = pline.partition(', ')  # pline convert to tuple
-
-                # isolate _id, stripping quotes
-                _id = pline[0].replace('\"', '')
-                # possible bug here:
-                # empty quotes register as empty _id when replaced
-
-                # if arguments exist beyond _id
-                pline = pline[2].strip()  # pline is now str
-                if pline:
-                    # check for *args or **kwargs
-                    if pline[0] == '{' and pline[-1] == '}'\
-                            and type(eval(pline)) is dict:
-                        _args = pline
-                    else:
-                        _args = pline.replace(',', '')
-                        # _args = _args.replace('\"', '')
-            line = ' '.join([_cmd, _cls, _id, _args])
-
-        except Exception as mess:
-            pass
-        finally:
-            return line
-
-    def postcmd(self, stop, line):
-        """Prints if isatty is false"""
-        if not sys.__stdin__.isatty():
-            print('(hbnb) ', end='')
-        return stop
+        Args:
+            classname (str): Name of the class of object to be updated.
+            line (str): Unprocessed string as recieved from the console.
+        '''
+        dictionary = re.findall("({.*})", line)
+        dictionary[0] = dictionary[0].replace("\'", "\"")
+        inputs = json.loads(dictionary[0])
+        grouped_strings = re.findall("(\".*?\")", line)
+        id_string = grouped_strings[0].replace("\"", "")
+        for key, val in inputs.items():
+            self.do_update(classname + " " + id_string + " " + key + " " +
+                           str(val))
 
     def do_quit(self, command):
         """ Method to exit the HBNB console"""
