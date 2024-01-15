@@ -6,9 +6,8 @@ This provides the basic functionality for all other classes.
 Dependencies:
     uuid4 - generates unique id's for each instance
     datetime - provides date and time information
-    models - module containing all classes
+    storage - stores instances of classes
 """
-import models
 from uuid import uuid4
 from datetime import datetime
 
@@ -16,7 +15,7 @@ from datetime import datetime
 class BaseModel:
     """
     Base Class for basic functionality for all classes.
-    
+
     Attributes:
         id - unique id for each instance
         created_at - time instance was created
@@ -33,7 +32,7 @@ class BaseModel:
         Instantiates a new BaseModel.
         If kwargs are given, instance is set to values in kwargs.
         Otherwise, a new instance is created with new id and created_at time.
-        
+
         Kwargs:
             id - unique id for each instance
             created_at - time instance was created
@@ -41,7 +40,7 @@ class BaseModel:
         """
         current_time = datetime.now()  # Taking time-stamp for consistency.
         if len(kwargs) == 0:  # If no kwargs were passsed.
-            from models import storage  # For storing new instance.
+            from models import storage
             self.id = str(uuid4())  # Generating unique id.
             self.created_at = current_time
             self.updated_at = current_time
