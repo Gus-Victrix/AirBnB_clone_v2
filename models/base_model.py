@@ -53,7 +53,7 @@ class BaseModel:
                     if key != 'created_at' and key != 'updated_at':
                         setattr(self, key, value)
                     else:  # Setting datetime objects.
-                        setattr(self, key, datetime.isoformat(value))
+                        setattr(self, key, datetime.fromisoformat(value))
 
     def __str__(self):
         """
@@ -88,7 +88,7 @@ class BaseModel:
         """
         dictionary = self.__dict__.copy()  # Copying to avoid overwriting.
         # Converting datetime objects to isoformat.
-        dictionary['created_at'] = dictionary.['created_at'].isoformat()
-        dictionary['updated_at'] = dictionary.['updated_at'].isoformat()
+        dictionary['created_at'] = dictionary['created_at'].isoformat()
+        dictionary['updated_at'] = dictionary['updated_at'].isoformat()
         dictionary['__class__'] = self.__class__.__name__  # Adding class name.
         return dictionary
