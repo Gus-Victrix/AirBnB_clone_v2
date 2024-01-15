@@ -46,6 +46,29 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         classes - dictionary of classes available for use in console
         dot_cmds - list of commands that use dot notation
         types - dictionary of types for dot notation commands
+
+    Methods:
+        preloop - prints if isatty is false
+        precmd - reformat command line for advanced command syntax
+        postcmd - prints if isatty is false
+        do_quit - method to exit the HBNB console
+        help_quit - prints the help documentation for quit
+        do_EOF - handles EOF to exit program
+        help_EOF - prints the help documentation for EOF
+        emptyline - overrides the emptyline method of CMD
+        do_create - create an object of any class
+        _parse_value - parse a value string based on its format
+        help_create - help information for the create method
+        do_show - method to show an individual object
+        help_show - help information for the show command
+        do_destroy - destroys a specified object
+        help_destroy - help information for the destroy command
+        do_all - shows all objects, or all objects of a class
+        help_all - help information for the all command
+        do_count - count current number of class instances
+        help_count - help information for the count command
+        do_update - updates a certain object with new info
+        help_update - help information for the update class
     """
 
     # determines prompt for interactive/non-interactive modes
