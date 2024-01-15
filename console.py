@@ -29,10 +29,10 @@ import cmd  # Availing most of the functionality for the console
 import sys  # Availing the isatty() method to determine interactive mode
 from models.base_model import BaseModel  # Availing the BaseModel class
 from models.__init__ import storage  # Availing the storage engine
-from models.user import User # Availing the User class
-from models.place import Place # Availing the Place class
-from models.state import State # Availing the State class
-from models.city import City  # Availing the City class
+from models.user import User  # Availing the User class
+from models.place import Place  # Availing the Place class
+from models.state import State  # Availing the State class
+from models.city import City   # Availing the City class
 from models.amenity import Amenity  # Availing the Amenity class
 from models.review import Review  # Availing the Review class
 
@@ -72,7 +72,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
     """
 
     # determines prompt for interactive/non-interactive modes
-    prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
+    prompt = '(hbnb)' if sys.__stdin__.isatty() else ''
 
     classes = {
                'BaseModel': BaseModel, 'User': User, 'Place': Place,
