@@ -35,7 +35,9 @@ class FileStorage:
         __objects (dict): Dictionary of dictionaries containing all objects.
 
     Methods:
-        
+        all(self): Returns the dictionary __objects.
+        new(self, obj): Sets in __objects the obj with key <obj class name>.id
+        save(self): Serializes __objects to the JSON file (path: __file_path)
     """
     __file_path = 'file.json'
     __objects = {}
@@ -47,7 +49,10 @@ class FileStorage:
         return FileStorage.__objects
 
     def new(self, obj):
-        """Adds new object to storage dictionary"""
+        """
+        Add a new object to the current database session.
+        Format: <obj class name>.id : <object>
+        """
         key = obj.to_dict()['__class__'] + '.' + obj.id
         self.all()[key] = obj
 
