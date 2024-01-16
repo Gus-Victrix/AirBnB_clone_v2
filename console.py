@@ -117,14 +117,12 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
                 # The update is a special case, so it is handled separately
                 if inputs[0] == "update" and '{' in line and '}' in line:
                     self.dict_update(inputs[1], line)
-                else: # Otherwise, execute the command
+                else:  # Otherwise, execute the command
                     functions[inputs[0]](' '.join(inputs[1:]))  # Execute
             else:  # If command is not supported
                 print(f"*** Unknown syntax: {line}")
         else:  # If line does not match regex
             print(f"*** Unknown syntax: {line}")
-
-
 
     def dict_update(self, classname, line):
         '''
@@ -166,52 +164,80 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         pass
 
     def do_create(self, arg):
-        """ Create an object of any class"""
+        """
+        Create a new instance of a class and print its id.
+        Usage: create <class name> [<param name>=<param value>]
+               <class name>.create()
+        (Brackets denote optional fields in usage example.)
+        NOTE: Spacing in strings must be done using a dash (_).
+              Strings must start and end with double_quotes(").
+
+        Exceptions:
+            Prints "** class name missing **" if no class name is given.
+            Prints "** class doesn't exist **" if the class name is invalid.
+        """
+        # Handle missing class name
         if not arg:
             print("** class name missing **")
             return
-        elif arg.split()[0] not in HBNBCommand.classes:
+        # Extract class name and parameters
+        arg_list = arg.split()
+        # Handle invalid class name
+        if arg_list[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
 
-        # Extract class name and parameters
-        class_name, *params = arg.split()
-
-        # Parse parameters into a dictionary
-        param_dict = {}
-        for param in params:
-            key, value = param.split("=")
-            # Handle value parsing and type conversion
-            value = self._parse_value(value)
-            if value is not None:
-                param_dict[key] = value
+        class_name = arg_list[0]
 
         # Create an instance of the class with the parsed parameters
-        new_instance = HBNBCommand.classes[class_name](**param_dict)
+        new_instance = eval(class_name)(**self._parse_value(arg_list[1:]))
 
         # Save the instance and print its id
-        storage.save()
         print(new_instance.id)
+        storage.save()
 
-    def _parse_value(self, value):
+    def _parse_value(self, args):
         """
-        Parse a value string based on its format.
+        Converts a list into a dictionary of parameters and values.
+        Args:
+            args (list): List of parameters and values.
+                Format: ["<param name>=<param value>", ...]
+
+        Description:
+            If value is a string, it is converted to a string.
+            If vlue is a number, it is converted to an int or float.
+                > The ones containing a dot are converted to float.
+
+        Returns:
+            Dictionary of parameters and values. Empty dictionary if
+            args is empty or no parameters could be parsed.
         """
-        if value.startswith('"') and value.endswith('"'):
-            value = value[1:-1].replace("\\", "").replace("_", " ")
-            """
-            return value
-        elif "." in value:
-            try:
-                return float(value)
-            except ValueError:
-                return None
-        else:
-            try:
-                return int(value)
-            except ValueError:
-                return None
-            """
+        # Initialize dictionary
+        kwargs = {}
+
+        # Iterate through args
+        for arg in args:
+            if '=' in arg:  # If arg is in a valid format
+                key, value = arg.split('=')  # Split into key and value
+                # Parse value
+                if value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1].replace("_", " ").replace('"', '')
+
+                elif "." in value:
+                    try:
+                        value = float(value)
+                    except ValueError:
+                        continue
+                else:
+                    try:
+                        value = int(value)
+                    except ValueError:
+                        continue
+                # Add key and value to dictionary
+                kwargs[key] = value
+        print(kwargs)
+        return kwargs
+
     def help_create(self):
         """ Help information for the create method """
         print("Creates a class of any type")
