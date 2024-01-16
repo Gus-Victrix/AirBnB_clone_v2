@@ -1,9 +1,60 @@
-<center> <h1>HBNB - The Console</h1> </center>
+# 0x02. AirBnB clone - MySQL
+
+`Group project` `Python` `OOP` `Back-end` `SQL` `MySQL` `ORM` `SQLAlchemy`
+
+
+## Built, Tested, and (_Probably_) runs using:
+
+- `Ubuntu 20.04 LTS` (Development Environment)
+- `Python 3.8.5` (Basically all `Back-end`)
+- `MySQL 8.0` (`Database`)
+- `SQLAlchemy 1.4.x` (`ORM`)
+- `vim 9.0` (Let it be known that we can exit vim)
+- `pycodestyle 2.8.x` (Style critic)
+- `unittest` (All code was :100: tested before pushing)
+- `venv` (To avoid breaking our own machines)
+
+## Purpose of the project:
+
+> [!NOTE]
+> We mostly did this to show off `Database` and `ORM` skills acquired in the
+(ALX SE)[https://www.alxafrica.com] full-stack Software Engineering program to
+potential future employers and colaborators.
+
+ ### Skills Tested:
+ - `Collaboration`.
+ - `Refactoring` and improving existing codebases.
+ - Patience while `Debbugging`
+ - `Unit Testing`
+
+## How to get started using the product:
+
+1. Clone the repository:
+ ```bash
+ git clone https://github.com/Gus-Victrix/AirBnB_clone_v2
+ ```
+2. Enter the repository directory:
+ ```bash
+ $ cd AirBnB_clone_v2
+ ```
+3. Run the script named console.py:
+```bash
+$ ./console.py
+```
+
+And _voila_... The console runs!
+
+## Implemented Features & how to use them:
+
+*__Will be updated on an unforeseeable future date__*
+
+
 
 This repository contains the initial stage of a student project to build a clone of the AirBnB website. This stage implements a backend interface, or console, to manage program data. Console commands allow the user to create, update, and destroy objects, as well as manage file storage. Using a system of JSON serialization/deserialization, storage is persistent between sessions.
 
 ---
 
+## 
 <center><h3>Repository Contents by Project Task</h3> </center>
 
 | Tasks | Files | Description |

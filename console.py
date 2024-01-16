@@ -1,96 +1,130 @@
 #!/usr/bin/python3
-""" Console Module """
-import cmd
-import sys
-from models.base_model import BaseModel
-from models.__init__ import storage
-from models.user import User
-from models.place import Place
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.review import Review
+"""
+This module contains the entry point of the command interpreter.
+It defines the Console class, which contains the functionality for the
+HBNB console.
+
+Usage: ./console.py (interactive mode)
+       ./console.py <command> (one time execution mode)
+
+Classes:
+    HBNBCommand - contains the functionality for the HBNB console
+
+Dependencies:
+    cmd - implements the command line interpreter
+    sys - provides access to some variables used or maintained by the
+          interpreter and to functions that interact strongly with the
+          interpreter
+    models.base_model - defines all common attributes/methods for other
+                        classes
+    models.__init__ - initializes a storage engine
+    models.user - defines attributes/methods for the User class
+    models.place - defines attributes/methods for the Place class
+    models.state - defines attributes/methods for the State class
+    models.city - defines attributes/methods for the City class
+    models.amenity - defines attributes/methods for the Amenity class
+    models.review - defines attributes/methods for the Review class
+"""
+import re  # Availing regular expression functionality
+import shlex  # Availing lexical analysis functionality
+import cmd  # Availing most of the functionality for the console
+import sys  # Availing the isatty() method to determine interactive mode
+from models.base_model import BaseModel  # Availing the BaseModel class
+from models.__init__ import storage  # Availing the storage engine
+from models.user import User  # Availing the User class
+from models.place import Place  # Availing the Place class
+from models.state import State  # Availing the State class
+from models.city import City   # Availing the City class
+from models.amenity import Amenity  # Availing the Amenity class
+from models.review import Review  # Availing the Review class
 
 
-class HBNBCommand(cmd.Cmd):
-    """ Contains the functionality for the HBNB console"""
+class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
+    """
+    Fully functional command interpreter for the HBNB project.
 
-    # determines prompt for interactive/non-interactive modes
-    prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
+    Attributes:
+        prompt - determines prompt for interactive/non-interactive modes
+        classes - dictionary of classes available for use in console
+        dot_cmds - list of commands that use dot notation
+        types - dictionary of types for dot notation commands
+
+    Methods:
+        preloop - prints if isatty is false
+        precmd - reformat command line for advanced command syntax
+        postcmd - prints if isatty is false
+        do_quit - method to exit the HBNB console
+        help_quit - prints the help documentation for quit
+        do_EOF - handles EOF to exit program
+        help_EOF - prints the help documentation for EOF
+        emptyline - overrides the emptyline method of CMD
+        do_create - create an object of any class
+        _parse_value - parse a value string based on its format
+        help_create - help information for the create method
+        do_show - method to show an individual object
+        help_show - help information for the show command
+        do_destroy - destroys a specified object
+        help_destroy - help information for the destroy command
+        do_all - shows all objects, or all objects of a class
+        help_all - help information for the all command
+        do_count - count current number of class instances
+        help_count - help information for the count command
+        do_update - updates a certain object with new info
+        help_update - help information for the update class
+    """
+    prompt = '(hbnb)'  # Set prompt to be used by Cmd
 
     classes = {
                'BaseModel': BaseModel, 'User': User, 'Place': Place,
                'State': State, 'City': City, 'Amenity': Amenity,
                'Review': Review
               }
-    dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
              'number_rooms': int, 'number_bathrooms': int,
              'max_guest': int, 'price_by_night': int,
              'latitude': float, 'longitude': float
             }
 
-    def preloop(self):
-        """Prints if isatty is false"""
-        if not sys.__stdin__.isatty():
-            print('(hbnb)')
-
-    def precmd(self, line):
-        """Reformat command line for advanced command syntax.
+    def default(self, line):
+        """
+        Handles advanced command syntax.
+        It is executed when a command is not recognized.
 
         Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
         (Brackets denote optional fields in usage example.)
+        The following commands are supported:
+            <class name>.all()
+            <class name>.count()
+            <class name>.create()
+            <class name>.show(<id>)
+            <class name>.destroy(<id>)
+            <class name>.update(<id>, <attribute name>, <attribute value>)
+            <class name>.update(<id>, <dictionary representation>)
         """
-        _cmd = _cls = _id = _args = ''  # initialize line elements
+        functions = {
+                "all": self.do_all,
+                "count": self.do_count,
+                "create": self.do_create,
+                "show": self.do_show,
+                "destroy": self.do_destroy,
+                "update": self.do_update
+                }
+        regex = r"(.*)\.(.*)\((.*)\)"  # Matches <class>.<command>(<id>)
+        if re.search(regex, line):  # If line matches regex
+            inputs = re.sub(regex, r"\2 \1 \3", line)  # Rearrange to normal
+            inputs = shlex.split(inputs)  # Split into list respecting quotes
+            if inputs[0] in functions.keys():  # If command is supported
+                # The update is a special case, so it is handled separately
+                if inputs[0] == "update" and '{' in line and '}' in line:
+                    self.dict_update(inputs[1], line)
+                else: # Otherwise, execute the command
+                    functions[inputs[0]](' '.join(inputs[1:]))  # Execute
+            else:  # If command is not supported
+                print(f"*** Unknown syntax: {line}")
+        else:  # If line does not match regex
+            print(f"*** Unknown syntax: {line}")
 
-        # scan for general formating - i.e '.', '(', ')'
-        if not ('.' in line and '(' in line and ')' in line):
-            return line
 
-        try:  # parse line left to right
-            pline = line[:]  # parsed line
-
-            # isolate <class name>
-            _cls = pline[:pline.find('.')]
-
-            # isolate and validate <command>
-            _cmd = pline[pline.find('.') + 1:pline.find('(')]
-            if _cmd not in HBNBCommand.dot_cmds:
-                raise Exception
-
-            # if parantheses contain arguments, parse them
-            pline = pline[pline.find('(') + 1:pline.find(')')]
-            if pline:
-                # partition args: (<id>, [<delim>], [<*args>])
-                pline = pline.partition(', ')  # pline convert to tuple
-
-                # isolate _id, stripping quotes
-                _id = pline[0].replace('\"', '')
-                # possible bug here:
-                # empty quotes register as empty _id when replaced
-
-                # if arguments exist beyond _id
-                pline = pline[2].strip()  # pline is now str
-                if pline:
-                    # check for *args or **kwargs
-                    if pline[0] == '{' and pline[-1] =='}'\
-                            and type(eval(pline)) is dict:
-                        _args = pline
-                    else:
-                        _args = pline.replace(',', '')
-                        # _args = _args.replace('\"', '')
-            line = ' '.join([_cmd, _cls, _id, _args])
-
-        except Exception as mess:
-            pass
-        finally:
-            return line
-
-    def postcmd(self, stop, line):
-        """Prints if isatty is false"""
-        if not sys.__stdin__.isatty():
-            print('(hbnb) ', end='')
-        return stop
 
     def do_quit(self, command):
         """ Method to exit the HBNB console"""
@@ -136,7 +170,7 @@ class HBNBCommand(cmd.Cmd):
 
         # Create an instance of the class with the parsed parameters
         new_instance = HBNBCommand.classes[class_name](**param_dict)
-    
+
         # Save the instance and print its id
         storage.save()
         print(new_instance.id)
@@ -221,7 +255,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del(storage.all()[key])
+            del storage.all()[key]
             storage.save()
         except KeyError:
             print("** no instance found **")
@@ -353,6 +387,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
