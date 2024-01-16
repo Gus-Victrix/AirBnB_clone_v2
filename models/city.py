@@ -1,9 +1,32 @@
 #!/usr/bin/python3
-""" City Module for HBNB project """
-from models.base_model import BaseModel
+"""
+Module defines City class.
+City inherits from BaseModel class and Base class.
+
+Dependencies:
+    sqlalchemy
+    models/base_model.py
+"""
+from sqlalchemy import Column, String, ForeignKey
+from models.base_model import BaseModel, Base, storage_type
 
 
-class City(BaseModel):
-    """ The city class, contains state ID and name """
-    state_id = ""
-    name = ""
+class City(BaseModel, Base):
+    """
+    Representation of City where the particular entry is located.
+    It's a child of State class.
+    Inherits from BaseModel and Base.
+
+    Attributes:
+        __tablename__ (str): Table name in MySQL database.
+        name (sqlalchemy String): City name.
+        state_id (sqlalchemy String): State id.
+    """
+    if storage_type == "db":  # If set storage type is db
+        __tablename__ = "cities"  # Table name in MySQL database
+        # Setting up schema for sqlalchemy
+        name = Column(String(128), nullable=False)
+        state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
+    else:  # If set storage type is file
+        state_id = ""
+        name = ""
