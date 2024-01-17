@@ -18,7 +18,7 @@ from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
 
-class Amenity(BaseModel):
+class Amenity(BaseModel, Base):
     """
     Defines amenities that may be available at a place.
     Has a many to many relationship with the Place class.
