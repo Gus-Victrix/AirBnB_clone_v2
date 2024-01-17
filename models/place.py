@@ -12,12 +12,12 @@ Dependencies:
     SQLAlchemy: ORM.
     BaseModel: Base class for all models.
 """
+import models
 from models.base_model import BaseModel, Base, storage_type
 from models.review import Review
 from models.amenity import Amenity
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
-import models
 
 
 if storage_type == "db":
@@ -71,8 +71,8 @@ class Place(BaseModel, Base):
         longitude = Column(Float, nullable=True)
         reviews = relationship("Review", cascade="all, delete",
                                backref="place")
-        amenities = relationship("Amenity", secondary=place_amenity,
-                                 viewonly=False, backref="place_amenities")
+        amenities = relationship("Amenity", secondary="place_amenity",
+                                 viewonly=False, back_populates="place_amenities")
     else:
         city_id = ""
         user_id = ""
@@ -86,15 +86,16 @@ class Place(BaseModel, Base):
         longitude = 0.0
         amenity_ids = []
 
+"""
     @property
     def reviews(self):
-        """
+        #
         Getter attribute in case of file storage.
 
         Returns:
             A list of Review objects with place_id equal to the current
             Place.id.
-        """
+        #
         review_list = []
         for review in models.storage.all(Review).values():
             if review.place_id == self.id:
@@ -103,13 +104,13 @@ class Place(BaseModel, Base):
 
     @property
     def amenities(self):
-        """
+        #
         Getter attribute in case of file storage.
 
         Returns:
             A list of Amenity objects with place_id equal to the current
             Place.id.
-        """
+        #
         amenity_list = []
         for amenity in models.storage.all(Amenity).values():
             if amenity.id in self.amenity_ids:
@@ -118,11 +119,13 @@ class Place(BaseModel, Base):
 
     @amenities.setter
     def amenities(self, obj):
-        """
+    
         Setter attribute in case of file storage.
 
         Args:
             obj: An Amenity object.
-        """
+        
         if isinstance(obj, Amenity):
             self.amenity_ids.append(obj.id)
+
+"""

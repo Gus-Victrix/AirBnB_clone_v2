@@ -37,6 +37,7 @@ from models.state import State  # Availing the State class
 from models.city import City   # Availing the City class
 from models.amenity import Amenity  # Availing the Amenity class
 from models.review import Review  # Availing the Review class
+from models.engine.db_storage import DBStorage
 
 
 class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
@@ -73,6 +74,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         help_update - help information for the update class
     """
     prompt = '(hbnb)'  # Set prompt to be used by Cmd
+    storage = DBStorage()
 
     classes = {
                'BaseModel': BaseModel, 'User': User, 'Place': Place,
@@ -190,6 +192,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
 
         class_name = arg_list[0]
 
+
         # Create an instance of the class with the parsed parameters
         new_instance = eval(class_name)(**self._parse_value(arg_list[1:]))
 
@@ -281,7 +284,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         """ Destroys a specified object """
         new = args.partition(" ")
         c_name = new[0]
-        c_id = new[2]
+#        c_id = new[2]
         if c_id and ' ' in c_id:
             c_id = c_id.partition(' ')[0]
 
@@ -312,13 +315,21 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
 
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
-        print_list = []
-
-        if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
-                print("** class doesn't exist **")
-                return
+        args = shlex.split(args)
+        obj_list = []
+        if len(args) == 0:
+            obj_dict = self.storage.all()
+        elif args[0] in HBNBCommand.classes:
+            obj_dict = self.storage.all(HBNBCommand.classes[args[0]])
+        else:
+            print("** class doesn't exist **")
+            return False
+        for key in obj_dict:
+            obj_list.append(str(obj_dict[key]))
+        print("[", end="")
+        print(", ".join(obj_list), end="")
+        print("]")
+        """
             for k, v in storage._FileStorage__objects.items():
                 if k.split('.')[0] == args:
                     print_list.append(str(v))
@@ -327,6 +338,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
                 print_list.append(str(v))
 
         print(print_list)
+        """
 
     def help_all(self):
         """ Help information for the all command """
