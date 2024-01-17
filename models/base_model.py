@@ -49,7 +49,7 @@ class BaseModel:
             updated_at - time instance was updated
         """
         if storage_type == "db":  # Setting up schema for sqlalchemy
-            # Seting up id column 
+            # Seting up id column
             id = Column(String(60), nullable=False, primary_key=True)
             # Setting up creation time column and updated time column
             current_time = datetime.utcnow
