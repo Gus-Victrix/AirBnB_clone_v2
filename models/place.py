@@ -17,6 +17,7 @@ from models.review import Review
 from models.amenity import Amenity
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
+import models
 
 
 if storage_type == "db":
@@ -70,8 +71,7 @@ class Place(BaseModel, Base):
         reviews = relationship("Review", cascade="all, delete",
                                backref="place")
         amenities = relationship("Amenity", secondary=place_amenity,
-                                 viewonly=False,
-                                 backref="place_amenities")
+                                 viewonly=False, backref="place_amenities")
     else:
         city_id = ""
         user_id = ""
@@ -94,10 +94,8 @@ class Place(BaseModel, Base):
             A list of Review objects with place_id equal to the current
             Place.id.
         """
-        from models import storage
-        from models.review import Review
         review_list = []
-        for review in storage.all(Review).values():
+        for review in models.storage.all(Review).values():
             if review.place_id == self.id:
                 review_list.append(review)
         return review_list
@@ -111,11 +109,9 @@ class Place(BaseModel, Base):
             A list of Amenity objects with place_id equal to the current
             Place.id.
         """
-        from models import storage
-        from models.amenity import Amenity
         amenity_list = []
-        for amenity in storage.all(Amenity).values():
-            if amenity.place_id == self.id:
+        for amenity in models.storage.all(Amenity).values():
+            if amenity.id in self.amenity_ids:
                 amenity_list.append(amenity)
         return amenity_list
 
@@ -127,6 +123,5 @@ class Place(BaseModel, Base):
         Args:
             obj: An Amenity object.
         """
-        from models.amenity import Amenity
         if isinstance(obj, Amenity):
             self.amenity_ids.append(obj.id)
