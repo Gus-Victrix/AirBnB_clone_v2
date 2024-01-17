@@ -79,7 +79,7 @@ class DBStorage:
             for obj in objects:  # Add each returned object to dictionary
                 key = f"{obj.__class__.__name__}.{obj.id}"
                 objects_dict[key] = obj  # Key = <class name>.<object id>
-    return objects_dict
+        return objects_dict
 
     def new(self, obj):
         """
