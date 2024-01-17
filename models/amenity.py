@@ -21,7 +21,7 @@ from sqlalchemy.orm import relationship
 class Amenity(BaseModel):
     """
     Defines amenities that may be available at a place.
-    Child table of Place.
+    Has a many to many relationship with the Place class.
 
     Attributes:
         name (str): The name of the amenity.
