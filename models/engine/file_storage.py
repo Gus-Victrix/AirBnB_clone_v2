@@ -9,10 +9,23 @@ class FileStorage:
     __objects = {}
 
     def all(self, cls=None):
-        """Returns a dictionary or a filtered dictionary of models currently in storage"""
+        """
+        Returns a dictionary of models currently in storage.
+        If cls is not None, returns a dictionary of models of type cls
+
+        Args:
+            cls (str): The name of the class type to return
+
+        Returns:
+            A dictionary of models in storage
+        """
         if cls:
-            return {key: obj for key, obj in FileStorage.__objects.items() if isinstance(obj, cls)}
-        return FileStorage.__objects
+            instances = {}
+            for key, obj in self.__objects.items():
+                if isinstance(obj, cls):
+                    instances[key] = obj
+            return instances
+        return self.__objects
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -21,8 +34,11 @@ class FileStorage:
 
     def save(self):
         """Saves storage dictionary to file"""
-        with open(FileStorage.__file_path, 'w') as f:
-            temp = {key: obj.to_dict() for key, obj in FileStorage.__objects.items()}
+        with open(self.__file_path, 'w') as f:
+            temp = {}
+            temp.update(self.__objects)
+            for key, val in temp.items():
+                temp[key] = val.to_dict()
             json.dump(temp, f)
 
     def reload(self):
@@ -53,3 +69,9 @@ class FileStorage:
         if obj:
             key = obj.to_dict()['__class__'] + '.' + obj.id
             FileStorage.__objects.pop(key, None)
+            self.save()
+        return
+
+    def close(self):
+        """Calls reload() method for deserializing the JSON file to objects"""
+        self.reload()
