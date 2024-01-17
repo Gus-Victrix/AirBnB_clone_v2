@@ -8,7 +8,7 @@ from models.review import Review
 
 
 
-class User(BaseModel):
+class User(BaseModel, Base):
     """This class defines a user by various attributes"""
     if storage_type == "db":
         __tablename__ = 'users'
