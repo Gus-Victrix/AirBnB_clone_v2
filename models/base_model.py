@@ -8,7 +8,18 @@ Dependencies:
     datetime - provides date and time information
     storage - stores instances of classes
 """
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, DateTime, Integer
 from uuid import uuid4
+from datetime import datetime
+from os import getenv  # For accessing environment variables
+
+storage_type = getenv("HBNB_TYPE_STORAGE")
+
+if storage_type == "db":  # Checking current storage-type settings
+    Base = declarative_base()  # Creating base class for SQLAlchemy.
+else:
+    Base = object
 
 
 class BaseModel:
@@ -37,6 +48,13 @@ class BaseModel:
             created_at - time instance was created
             updated_at - time instance was updated
         """
+        if storage_type == "db":  # Setting up schema for sqlalchemy
+            # Seting up id column
+            id = Column(String(60), nullable=False, primary_key=True)
+            # Setting up creation time column and updated time column
+            current_time = datetime.utcnow
+            created_at = Column(DateTime, default=current_time)
+            updated_at = Column(DateTime, default=current_time)
         current_time = datetime.now()  # Taking time-stamp for consistency.
         if len(kwargs) == 0:  # If no kwargs were passsed.
             from models import storage
