@@ -118,7 +118,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
                 if inputs[0] == "update" and '{' in line and '}' in line:
                     self.dict_update(inputs[1], line)
 
-                else: # Otherwise, execute the command
+                else:
                     functions[inputs[0]](' '.join(inputs[1:]))  # Execute
             else:  # If command is not supported
                 print(f"*** Unknown syntax: {line}")

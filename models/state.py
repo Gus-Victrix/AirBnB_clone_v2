@@ -7,6 +7,7 @@ from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 from os import getenv
 
+
 class State(BaseModel, Base):
     """
     Representation of the State in which a city is located.
@@ -15,6 +16,7 @@ class State(BaseModel, Base):
     if storage_type == "db":
         __tablename__ = "states"
         name = Column(String(128), nullable=False)
+        id = Column(String(60), primary_key=True)
         cities = relationship("City", backref="state", cascade="delete")
     else:
         name = ""

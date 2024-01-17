@@ -60,7 +60,7 @@ class DBStorage:
         if env == 'test':
             Base.metadata.drop_all(self.__engine)
 
-    def all(self, cls=None): 
+    def all(self, cls=None):
         """Queries current database session based on class name
 
         Args:

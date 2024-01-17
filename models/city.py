@@ -7,10 +7,10 @@ Dependencies:
     sqlalchemy
     models/base_model.py
 """
-
 from sqlalchemy import Column, String, ForeignKey
 from models.base_model import BaseModel, Base, storage_type
 from sqlalchemy.orm import relationship
+
 
 class City(BaseModel, Base):
     """
@@ -28,7 +28,9 @@ class City(BaseModel, Base):
         # Setting up schema for sqlalchemy
         name = Column(String(128), nullable=False)
         state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
+        id = Column(String(60), primary_key=True)
         places = relationship("Place", backref="cities", cascade="delete")
+        state = relationship('State', back_populates='cities')
 
     else:  # If set storage type is file
         state_id = ""
