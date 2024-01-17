@@ -11,6 +11,13 @@ Dependencies:
     environ: environment variables
 
 """
+from models.city import City  # City class
+from models.place import Place  # Place class
+from models.review import Review  # Review class
+from models.state import State  # State class
+from models.user import User  # User class
+from models.amenity import Amenity  # Amenity class
+from models.base_model import Base, BaseModel  # Base classes
 from os import environ  # Environment variables
 from sqlalchemy import create_engine  # ORM engine instantiator
 from sqlalchemy.orm import sessionmaker, scoped_session  # ORM session manager
@@ -40,14 +47,14 @@ class DBStorage:
         # Get environment variables
         user = environ.get('HBNB_MYSQL_USER')
         pwd = environ.get('HBNB_MYSQL_PWD')
-        host = environ.get('HBNB_MYSQL_HOST')
+        host = environ.get('HBNB_MYSQL_HOST', default='localhost')
         db = environ.get('HBNB_MYSQL_DB')
         env = environ.get('HBNB_ENV')
 
         # Create engine
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                      .format(user, pwd, host, db),
-                                      pool_pre_ping=True)
+        self.__engine = create_engine(
+                f'mysql+mysqldb://{user}:{pwd}@{host}/{db}',
+                pool_pre_ping=True)
 
         # Drop tables if testing
         if env == 'test':
@@ -62,23 +69,17 @@ class DBStorage:
         Returns:
             returns dictionary of queried classes in database
         """
+        objects_dict = {}  # Dictionary to store queried objects
+        classes = [User, State, City, Amenity, Place, Review]
+        if cls:
+            classes = [cls]
         # Query all classes in database
-        if cls is None:
-            classes = ['User', 'State', 'City', 'Amenity', 'Place', 'Review']
-            objs = {}
-            for cls in classes:  # Query each class in database
-                query = self.__session.query(eval(cls)).all()
-                for obj in query:  # Add each returned object to dictionary
-                    key = obj.__class__.__name__ + '.' + obj.id
-                    objs[key] = obj  # Key = <class name>.<object id>
-        # Query specific class in database
-        else:
-            query = self.__session.query(cls).all()  # Query class in database
-            objs = {}
-            for obj in query:  # Add each returned object to dictionary
-                key = obj.__class__.__name__ + '.' + obj.id
-                objs[key] = obj  # Key = <class name>.<object id>
-        return objs
+        for clss in classes:  # Query each class in database
+            objects = self.__session.query(clss).all()
+            for obj in objects:  # Add each returned object to dictionary
+                key = f"{obj.__class__.__name__}.{obj.id}"
+                objects_dict[key] = obj  # Key = <class name>.<object id>
+    return objects_dict
 
     def new(self, obj):
         """
@@ -110,14 +111,6 @@ class DBStorage:
         """
         Create all tables in database and current database session.
         """
-        from models.base_model import Base, BaseModel
-        from models.user import User
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.place import Place
-        from models.review import Review
-
         Base.metadata.create_all(self.__engine)  # Create all tables in db
         # Create session factory
         Session = sessionmaker(bind=self.__engine, expire_on_commit=False)
