@@ -31,7 +31,7 @@ if storage_type == "db":
                                  nullable=False))
 
 
-class Place(BaseModel):
+class Place(BaseModel, Base):
     """
     Representation of places in the storage.
 
