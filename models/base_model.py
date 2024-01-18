@@ -4,13 +4,13 @@ This module creates BaseModel class for AirBnB clone project.
 This provides the basic functionality for all other classes.
 
 Dependencies:
-    uuid4 - generates unique id's for each instance
+    uuid.uuid4 - generates unique id's for each instance
     datetime - provides date and time information
     storage - stores instances of classes
 """
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, DateTime, Integer
-from uuid import uuid4
+import uuid  # For generating unique id's
 from os import getenv  # For accessing environment variables
 import models
 import datetime
@@ -75,6 +75,19 @@ class BaseModel:
                             setattr(self, key, value)
                         else:  # Setting datetime objects.
                             setattr(self, key, datetime.fromisoformat(value))
+                if 'id' not in kwargs.keys():
+                    self.id = str(uuid.uuid4())
+                if 'created_at' not in kwargs.keys():
+                    self.created_at = current_time
+                else:
+                    self.created_at = datetime.fromisoformat(
+                            kwargs['created_at'])
+                if 'updated_at' not in kwargs.keys():
+                    self.updated_at = current_time
+                else:
+                    self.updated_at = datetime.fromisoformat(
+                            kwargs['updated_at'])
+
 
     def __str__(self):
         """
