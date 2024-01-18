@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.8
 """ """
 from models.base_model import BaseModel
 import unittest
@@ -6,6 +6,9 @@ import datetime
 from uuid import UUID
 import json
 import os
+from os import getenv
+
+storageType = getenv("HBNB_TYPE_STORAGE")
 
 
 class test_basemodel(unittest.TestCase):
@@ -24,7 +27,7 @@ class test_basemodel(unittest.TestCase):
     def tearDown(self):
         try:
             os.remove('file.json')
-        except Exception:
+        except:
             pass
 
     def test_default(self):
@@ -47,6 +50,7 @@ class test_basemodel(unittest.TestCase):
         with self.assertRaises(TypeError):
             new = BaseModel(**copy)
 
+    @unittest.skipIf(storageType == "db", "Not for alchemy")
     def test_save(self):
         """ Testing save """
         i = self.value()
@@ -60,7 +64,7 @@ class test_basemodel(unittest.TestCase):
         """ """
         i = self.value()
         self.assertEqual(str(i), '[{}] ({}) {}'.format(self.name, i.id,
-                         i.__dict__))
+                                                       i.__dict__))
 
     def test_todict(self):
         """ """
@@ -73,12 +77,6 @@ class test_basemodel(unittest.TestCase):
         n = {None: None}
         with self.assertRaises(TypeError):
             new = self.value(**n)
-
-#   def test_kwargs_one(self):
-#       """ """
-#       n = {'Name': 'test'}
-#       with self.assertRaises(KeyError):
-#           new = self.value(**n)
 
     def test_id(self):
         """ """
@@ -94,10 +92,3 @@ class test_basemodel(unittest.TestCase):
         """ """
         new = self.value()
         self.assertEqual(type(new.updated_at), datetime.datetime)
-#       n = new.to_dict()
-#       new = BaseModel(**n)
-#       self.assertFalse(new.created_at == new.updated_at)
-
-
-if __name__ == '__main__':
-    unittest.main()
