@@ -8,6 +8,7 @@ Dependencies:
     datetime - provides date and time information
     storage - stores instances of classes
 """
+import uuid
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, DateTime, Integer
 from uuid import uuid4
@@ -37,6 +38,11 @@ class BaseModel:
         save - updates updated_at with current time when instance is changed
         to_dict - converts instance into dict format
     """
+    if storage_type == "db":
+        id = Column(String(60), nullable=False, primary_key=True)
+        created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+        updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
     def __init__(self, *args, **kwargs):
         """
         Instantiates a new BaseModel.
@@ -48,6 +54,7 @@ class BaseModel:
             created_at - time instance was created
             updated_at - time instance was updated
         """
+        """
         if storage_type == "db":  # Setting up schema for sqlalchemy
             # Seting up id column
             id = Column(String(60), nullable=False, primary_key=True)
@@ -55,10 +62,10 @@ class BaseModel:
             current_time = datetime.utcnow
             created_at = Column(DateTime, default=current_time)
             updated_at = Column(DateTime, default=current_time)
-        current_time = datetime.now()  # Taking time-stamp for consistency.
+            current_time = datetime.now()  # Taking time-stamp for consistency.
         if len(kwargs) == 0:  # If no kwargs were passsed.
             from models import storage
-            self.id = str(uuid4())  # Generating unique id.
+            self.id = str(uuid.uuid4())  # Generating unique id.
             self.created_at = current_time
             self.updated_at = current_time
             storage.new(self)
@@ -70,6 +77,23 @@ class BaseModel:
                         setattr(self, key, value)
                     else:  # Setting datetime objects.
                         setattr(self, key, datetime.fromisoformat(value))
+        """
+        current_time = datetime.utcnow()
+        if storage_type == "db":
+            self.id = str(uuid.uuid4())
+
+        if not kwargs:
+            from models import storage
+            self.created_at = current_time
+            self.updated_at = current_time
+            storage.new(self)
+        else:
+            for key, value in kwargs.items():
+                if key != '__class__':
+                    if key != 'created_at' and key != 'updated_at':
+                        setattr(self, key, value)
+                    else:
+                        setattr(self, key, datetime.fromisoformat(value))
 
     def __str__(self):
         """
@@ -80,7 +104,12 @@ class BaseModel:
         Returns:
             Unofficial string representation of instance.
         """
-        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
+        class_name = self.__class__.__name__
+        attributes = {k: v for k, v in self.__dict__.items()
+                      if k != "_sa_instance_state"}
+        return "[{}] ({}) {}".format(class_name, self.id, attributes)
+#        return "({}) {}".format(self.id, str(self.__class__.__name__))
+#        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def save(self):
         """

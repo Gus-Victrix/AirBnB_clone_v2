@@ -38,6 +38,7 @@ from models.state import State  # Availing the State class
 from models.city import City   # Availing the City class
 from models.amenity import Amenity  # Availing the Amenity class
 from models.review import Review  # Availing the Review class
+from models.engine.db_storage import DBStorage
 
 
 class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
@@ -74,6 +75,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         help_update - help information for the update class
     """
     prompt = '(hbnb)'  # Set prompt to be used by Cmd
+    storage = DBStorage()
 
     classes = {
                'BaseModel': BaseModel, 'User': User, 'Place': Place,
@@ -190,6 +192,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
             return
 
         class_name = arg_list[0]
+
 
         # Create an instance of the class with the parsed parameters
         new_instance = eval(class_name)(**self._parse_value(arg_list[1:]))
