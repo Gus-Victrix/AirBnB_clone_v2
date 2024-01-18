@@ -56,12 +56,6 @@ class DBStorage:
                 f'mysql+mysqldb://{user}:{pwd}@{host}/{db}',
                 pool_pre_ping=True)
 
-        # Create a session factory
-        Session = sessionmaker(bind=self.__engine)
-
-        # Create a session instance
-        self.__session = Session()
-
         # Drop tables if testing
         if env == 'test':
             Base.metadata.drop_all(self.__engine)

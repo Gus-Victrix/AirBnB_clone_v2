@@ -30,7 +30,7 @@ class City(BaseModel, Base):
         state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
         id = Column(String(60), primary_key=True)
         places = relationship("Place", backref="cities", cascade="delete")
-        state = relationship('State', back_populates="cities")
+        state = relationship('State', back_populates='cities')
 
     else:  # If set storage type is file
         state_id = ""
