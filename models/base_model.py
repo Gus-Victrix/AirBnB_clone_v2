@@ -60,20 +60,21 @@ class BaseModel:
             created_at = Column(DateTime, default=current_time)
             updated_at = Column(DateTime, default=current_time)
         current_time = datetime.now()  # Taking time-stamp for consistency.
-        if len(kwargs) == 0:  # If no kwargs were passsed.
-            from models import storage
-            self.id = str(uuid4())  # Generating unique id.
-            self.created_at = current_time
-            self.updated_at = current_time
-            storage.new(self)
         else:
-            for key, value in kwargs.items():  # Iterating through kwargs.
-                if key != '__class__':  # Ignoring class name.
-                    # Setting anything that isn't a datetime object.
-                    if key != 'created_at' and key != 'updated_at':
-                        setattr(self, key, value)
-                    else:  # Setting datetime objects.
-                        setattr(self, key, datetime.fromisoformat(value))
+            if len(kwargs) == 0:  # If no kwargs were passsed.
+                from models import storage
+                self.id = str(uuid4())  # Generating unique id.
+                self.created_at = current_time
+                self.updated_at = current_time
+                storage.new(self)
+            else:
+                for key, value in kwargs.items():  # Iterating through kwargs.
+                    if key != '__class__':  # Ignoring class name.
+                        # Setting anything that isn't a datetime object.
+                        if key != 'created_at' and key != 'updated_at':
+                            setattr(self, key, value)
+                        else:  # Setting datetime objects.
+                            setattr(self, key, datetime.fromisoformat(value))
 
     def __str__(self):
         """

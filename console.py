@@ -192,7 +192,8 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         class_name = arg_list[0]
 
         # Create an instance of the class with the parsed parameters
-        new_instance = eval(class_name)(**self._parse_value(arg_list[1:]))
+        dictionary = self._parse_value(arg_list[1:])
+        new_instance = eval(class_name)(**dictionary)
 
         # Save the instance and print its id
         print(new_instance.id)
