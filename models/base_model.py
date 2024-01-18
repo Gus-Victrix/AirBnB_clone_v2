@@ -11,10 +11,14 @@ Dependencies:
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, DateTime, Integer
 from uuid import uuid4
-from datetime import datetime
 from os import getenv  # For accessing environment variables
+import models
+import datetime
+from datetime import datetime
 
 storage_type = getenv("HBNB_TYPE_STORAGE")
+
+Base = None
 
 if storage_type == "db":  # Checking current storage-type settings
     Base = declarative_base()  # Creating base class for SQLAlchemy.
@@ -88,6 +92,7 @@ class BaseModel:
         """
         from models import storage
         self.updated_at = datetime.now()
+        storage.new(self)
         storage.save()
 
     def to_dict(self):
