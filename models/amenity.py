@@ -32,12 +32,5 @@ class Amenity(BaseModel, Base):
     if storage_type == "db":  # In the case that the storage type is a database
         __tablename__ = "amenities"
         name = Column(String(128), nullable=False)
-        id = Column(String(60), primary_key=True)
-        place_amenities = relationship("Place", secondary="place_amenity",
-                                       back_populates="amenities")
     else:  # In the case that the storage type is a JSON file
         name = ""
-
-    def __init__(self, *args, **kwargs):
-        """Initialization of Amenity instance"""
-        super().__init__(*args, **kwargs)

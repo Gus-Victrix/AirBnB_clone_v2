@@ -59,8 +59,8 @@ class BaseModel:
             current_time = datetime.utcnow
             created_at = Column(DateTime, default=current_time)
             updated_at = Column(DateTime, default=current_time)
-        current_time = datetime.now()  # Taking time-stamp for consistency.
         else:
+        current_time = datetime.now()  # Taking time-stamp for consistency.
             if len(kwargs) == 0:  # If no kwargs were passsed.
                 from models import storage
                 self.id = str(uuid4())  # Generating unique id.
