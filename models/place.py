@@ -72,7 +72,8 @@ class Place(BaseModel, Base):
         reviews = relationship("Review", cascade="all, delete",
                                backref="place")
         amenities = relationship("Amenity", secondary="place_amenity",
-                                 viewonly=False, back_populates="place_amenities")
+                                 viewonly=False,
+                                 back_populates="place_amenities")
     else:
         city_id = ""
         user_id = ""
@@ -85,6 +86,7 @@ class Place(BaseModel, Base):
         latitude = 0.0
         longitude = 0.0
         amenity_ids = []
+
 
 """
     @property
@@ -119,12 +121,12 @@ class Place(BaseModel, Base):
 
     @amenities.setter
     def amenities(self, obj):
-    
+
         Setter attribute in case of file storage.
 
         Args:
             obj: An Amenity object.
-        
+
         if isinstance(obj, Amenity):
             self.amenity_ids.append(obj.id)
 

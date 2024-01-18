@@ -105,7 +105,8 @@ class BaseModel:
             Unofficial string representation of instance.
         """
         class_name = self.__class__.__name__
-        attributes = {k: v for k, v in self.__dict__.items() if k != "_sa_instance_state"}
+        attributes = {k: v for k, v in self.__dict__.items()
+                      if k != "_sa_instance_state"}
         return "[{}] ({}) {}".format(class_name, self.id, attributes)
 #        return "({}) {}".format(self.id, str(self.__class__.__name__))
 #        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"

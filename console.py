@@ -26,6 +26,7 @@ Dependencies:
     models.review - defines attributes/methods for the Review class
 """
 import re  # Availing regular expression functionality
+import json  # Availing JSON functionality
 import shlex  # Availing lexical analysis functionality
 import cmd  # Availing most of the functionality for the console
 import sys  # Availing the isatty() method to determine interactive mode
@@ -186,7 +187,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         # Extract class name and parameters
         arg_list = arg.split()
         # Handle invalid class name
-        if arg_list[0] not in HBNBCommand.classes:
+        if arg_list[0] not in self.classes.keys():
             print("** class doesn't exist **")
             return
 
@@ -239,7 +240,6 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
                         continue
                 # Add key and value to dictionary
                 kwargs[key] = value
-        print(kwargs)
         return kwargs
 
     def help_create(self):
@@ -248,30 +248,33 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         print("[Usage]: create <className>\n")
 
     def do_show(self, args):
-        """ Method to show an individual object """
-        new = args.partition(" ")
-        c_name = new[0]
-        c_id = new[2]
-
-        # guard against trailing args
-        if c_id and ' ' in c_id:
-            c_id = c_id.partition(' ')[0]
-
-        if not c_name:
+        """
+        Method to show an individual object
+        Usage: show <class name> <object id>
+                <class name>.show(<object id>)
+        Exceptions:
+            Prints "** class name missing **" if no class name is given.
+            Prints "** class doesn't exist **" if the class name is invalid.
+            Prints "** instance id missing **" if no object id is given.
+            Prints "** no instance found **" if the object id is invalid.
+        """
+        if not args:
             print("** class name missing **")
             return
+        args = args.strip()  # Remove leading and trailing spaces
+        args = args.split()  # Split into list
 
-        if c_name not in HBNBCommand.classes:
+        if args[0] not in self.classes.keys():
             print("** class doesn't exist **")
             return
 
-        if not c_id:
+        if len(args) == 1:  # If no id is given
             print("** instance id missing **")
             return
 
-        key = c_name + "." + c_id
+        key = f"{args[0]}.{args[1]}"  # Generate key: <class name>.<id>
         try:
-            print(storage._FileStorage__objects[key])
+            print(storage.all()[key])
         except KeyError:
             print("** no instance found **")
 
@@ -281,31 +284,33 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         print("[Usage]: show <className> <objectId>\n")
 
     def do_destroy(self, args):
-        """ Destroys a specified object """
-        new = args.partition(" ")
-        c_name = new[0]
-#        c_id = new[2]
-        if c_id and ' ' in c_id:
-            c_id = c_id.partition(' ')[0]
+        """
+        Destroys a specified object by class name and id.
 
-        if not c_name:
+        Usage: destroy <class name> <object id>
+                <class name>.destroy(<object id>)
+
+        Exceptions:
+            Prints "** class name missing **" if no class name is given.
+            Prints "** class doesn't exist **" if the class name is invalid.
+            Prints "** instance id missing **" if no object id is given.
+            Prints "** no instance found **" if the object id is invalid.
+        """
+        if not args:  # Case no argument passed
             print("** class name missing **")
             return
-
-        if c_name not in HBNBCommand.classes:
+        args = shlex.split(args)  # Turning args into a list
+        if args[0] not in self.classes.keys():  # If class name is invalid
             print("** class doesn't exist **")
             return
-
-        if not c_id:
+        if len(args) < 2:  # If no id is given
             print("** instance id missing **")
             return
-
-        key = c_name + "." + c_id
-
-        try:
+        key = f"{args[0]}.{args[1]}"  # Generate key: <class name>.<id>
+        try:  # Try to delete object
             del storage.all()[key]
             storage.save()
-        except KeyError:
+        except KeyError:  # If instance id is invalid
             print("** no instance found **")
 
     def help_destroy(self):
@@ -314,31 +319,29 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         print("[Usage]: destroy <className> <objectId>\n")
 
     def do_all(self, args):
-        """ Shows all objects, or all objects of a class"""
-        args = shlex.split(args)
-        obj_list = []
-        if len(args) == 0:
-            obj_dict = self.storage.all()
-        elif args[0] in HBNBCommand.classes:
-            obj_dict = self.storage.all(HBNBCommand.classes[args[0]])
-        else:
-            print("** class doesn't exist **")
-            return False
-        for key in obj_dict:
-            obj_list.append(str(obj_dict[key]))
-        print("[", end="")
-        print(", ".join(obj_list), end="")
-        print("]")
         """
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
-        else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
+        Shows all objects, or all objects of a class
+        Usage: all [<className>]
+                <className>.all()
+        """
+        print_list = []
 
+        if args:
+            args = args.strip()  # Remove leading and trailing spaces
+            if args not in self.classes.keys():
+                print("** class doesn't exist **")
+                return
+            for instance in storage.all().values():
+                if instance.__class__.__name__ == args:
+                    if hasattr(instance, "_sa_instance_state"):
+                        delattr(instance, "_sa_instance_state")
+                    print_list.append(str(instance))
+        else:
+            for instance in storage.all().values():
+                if hasattr(instance, "_sa_instance_state"):
+                    delattr(instance, "_sa_instance_state")
+                print_list.append(str(instance))
         print(print_list)
-        """
 
     def help_all(self):
         """ Help information for the all command """
@@ -346,10 +349,15 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         print("[Usage]: all <className>\n")
 
     def do_count(self, args):
-        """Count current number of class instances"""
+        """
+        Count current number of class instances
+        Usage: count <class name>
+               <class name>.count()
+        """
+        args = args.split()
         count = 0
-        for k, v in storage._FileStorage__objects.items():
-            if args == k.split('.')[0]:
+        for instance in storage.all().values():  # Iterate through instances
+            if args[0] == instance.__class__.__name__:  # If class name matches
                 count += 1
         print(count)
 
@@ -358,87 +366,60 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         print("Usage: count <class_name>")
 
     def do_update(self, args):
-        """ Updates a certain object with new info """
-        c_name = c_id = att_name = att_val = kwargs = ''
+        """
+        Updates the attribute values of an object.
 
-        # isolate cls from id/args, ex: (<cls>, delim, <id/args>)
-        args = args.partition(" ")
-        if args[0]:
-            c_name = args[0]
-        else:  # class name not present
+        Usage: update <class name> <id> <attribute name> <attribute value>
+               <class name>.update(<id>, <attribute name>, <attribute value>)
+               <class name>.update(<id>, <dictionary representation>)
+
+        Exceptions:
+            Prints "** class name missing **" if no class name is given.
+            Prints "** class doesn't exist **" if the class name is invalid.
+            Prints "** instance id missing **" if no object id is given.
+            Prints "** no instance found **" if the object id is invalid.
+            Prints "** attribute name missing **" if no attribute name is
+                given.
+            Prints "** value missing **" if no attribute value is given.
+        """
+        if not args:  # Unprovided arguments
             print("** class name missing **")
             return
-        if c_name not in HBNBCommand.classes:  # class name invalid
+        args = args.replace(",", "")  # Remove commas
+        args = shlex.split(args)  # Split into list respecting quotes
+
+        if args[0] not in self.classes.keys():  # Invalid class name
             print("** class doesn't exist **")
             return
-
-        # isolate id from args
-        args = args[2].partition(" ")
-        if args[0]:
-            c_id = args[0]
-        else:  # id not present
+        if len(args) < 2:  # No id provided
             print("** instance id missing **")
             return
-
-        # generate key from class and id
-        key = c_name + "." + c_id
-
+        key = f"{args[0]}.{args[1]}"  # Generate key: <class name>.<id>
         # determine if key is present
         if key not in storage.all():
             print("** no instance found **")
             return
+        if len(args) < 3:  # No attribute name provided
+            print("** attribute name missing **")
+            return
+        if len(args) < 4:  # No attribute value provided
+            print("** value missing **")
+            return
 
-        # first determine if kwargs or args
-        if '{' in args[2] and '}' in args[2] and type(eval(args[2])) is dict:
-            kwargs = eval(args[2])
-            args = []  # reformat kwargs into list, ex: [<name>, <value>, ...]
-            for k, v in kwargs.items():
-                args.append(k)
-                args.append(v)
-        else:  # isolate args
-            args = args[2]
-            if args and args[0] == '\"':  # check for quoted arg
-                second_quote = args.find('\"', 1)
-                att_name = args[1:second_quote]
-                args = args[second_quote + 1:]
-
-            args = args.partition(' ')
-
-            # if att_name was not quoted arg
-            if not att_name and args[0] != ' ':
-                att_name = args[0]
-            # check for quoted val arg
-            if args[2] and args[2][0] == '\"':
-                att_val = args[2][1:args[2].find('\"', 1)]
-
-            # if att_val was not quoted arg
-            if not att_val and args[2]:
-                att_val = args[2].partition(' ')[0]
-
-            args = [att_name, att_val]
-
-        # retrieve dictionary of current objects
-        new_dict = storage.all()[key]
-
-        # iterate through attr names and values
-        for i, att_name in enumerate(args):
-            # block only runs on even iterations
-            if (i % 2 == 0):
-                att_val = args[i + 1]  # following item is value
-                if not att_name:  # check for att_name
-                    print("** attribute name missing **")
-                    return
-                if not att_val:  # check for att_value
-                    print("** value missing **")
-                    return
-                # type cast as necessary
-                if att_name in HBNBCommand.types:
-                    att_val = HBNBCommand.types[att_name](att_val)
-
-                # update dictionary with name, value pair
-                new_dict.__dict__.update({att_name: att_val})
-
-        new_dict.save()  # save updates to file
+        current_obj = storage.all()[key]  # Get current object
+        if args[2] == "id" or args[2] == "created_at" or\
+                args[2] == "updated_at":
+            return
+        if args[3].isnumeric():  # If value is a number
+            args[3] = int(args[3])
+        else:
+            try:
+                _ = float(args[3])  # Try to convert to float
+                arg[3] = float(args[3])  # If successful, convert to float
+            except ValueError:
+                pass
+        setattr(current_obj, args[2], args[3])
+        storage.save()
 
     def help_update(self):
         """ Help information for the update class """
