@@ -799,7 +799,6 @@ class TestFunctions(unittest.TestCase):
             count = f.getvalue().strip()
         self.assertEqual(count, "0")
 
-
     def test_update(self):
         """
         Test for update function
