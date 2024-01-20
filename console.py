@@ -75,16 +75,8 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
     """
     prompt = '(hbnb)'  # Set prompt to be used by Cmd
 
-    classes = {
-               'BaseModel': BaseModel, 'User': User, 'Place': Place,
-               'State': State, 'City': City, 'Amenity': Amenity,
-               'Review': Review
-              }
-    types = {
-             'number_rooms': int, 'number_bathrooms': int,
-             'max_guest': int, 'price_by_night': int,
-             'latitude': float, 'longitude': float
-            }
+    classes = {"BaseModel", "User", "Place",
+               "State", "City", "Amenity", "Review"}
 
     def default(self, line):
         """
@@ -185,7 +177,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         # Extract class name and parameters
         arg_list = arg.split()
         # Handle invalid class name
-        if arg_list[0] not in self.classes.keys():
+        if arg_list[0] not in self.classes:
             print("** class doesn't exist **")
             return
 
@@ -262,7 +254,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         args = args.strip()  # Remove leading and trailing spaces
         args = args.split()  # Split into list
 
-        if args[0] not in self.classes.keys():
+        if args[0] not in self.classes:
             print("** class doesn't exist **")
             return
 
@@ -298,7 +290,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
             print("** class name missing **")
             return
         args = shlex.split(args)  # Turning args into a list
-        if args[0] not in self.classes.keys():  # If class name is invalid
+        if args[0] not in self.classes:  # If class name is invalid
             print("** class doesn't exist **")
             return
         if len(args) < 2:  # If no id is given
@@ -326,7 +318,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
 
         if args:
             args = args.strip()  # Remove leading and trailing spaces
-            if args not in self.classes.keys():
+            if args not in self.classes:
                 print("** class doesn't exist **")
                 return
             for instance in storage.all().values():
@@ -386,7 +378,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
         args = args.replace(",", "")  # Remove commas
         args = shlex.split(args)  # Split into list respecting quotes
 
-        if args[0] not in self.classes.keys():  # Invalid class name
+        if args[0] not in self.classes:  # Invalid class name
             print("** class doesn't exist **")
             return
         if len(args) < 2:  # No id provided
