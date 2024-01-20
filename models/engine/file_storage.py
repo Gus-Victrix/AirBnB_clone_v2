@@ -57,7 +57,7 @@ class FileStorage:
             'Review': Review
         }
         try:
-            with open(FileStorage.__file_path, 'r') as f:
+            with open(self.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
                     self.all()[key] = classes[val['__class__']](**val)
@@ -68,7 +68,7 @@ class FileStorage:
         """Deletes obj from __objects if it's inside"""
         if obj:
             key = obj.to_dict()['__class__'] + '.' + obj.id
-            FileStorage.__objects.pop(key, None)
+            self.__objects.pop(key, None)
             self.save()
         return
 
