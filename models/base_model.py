@@ -63,7 +63,7 @@ class BaseModel:
             current_time = datetime.now()  # Taking time-stamp for consistency.
             if len(kwargs) == 0:  # If no kwargs were passsed.
                 from models import storage
-                self.id = str(uuid4())  # Generating unique id.
+                self.id = str(uuid.uuid4())  # Generating unique id.
                 self.created_at = current_time
                 self.updated_at = current_time
                 storage.new(self)
