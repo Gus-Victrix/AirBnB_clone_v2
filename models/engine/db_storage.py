@@ -11,13 +11,6 @@ Dependencies:
     environ: environment variables
 
 """
-from models.city import City  # City class
-from models.place import Place  # Place class
-from models.review import Review  # Review class
-from models.state import State  # State class
-from models.user import User  # User class
-from models.amenity import Amenity  # Amenity class
-from models.base_model import Base, BaseModel  # Base classes
 from os import environ  # Environment variables
 from sqlalchemy import create_engine  # ORM engine instantiator
 from sqlalchemy.orm import sessionmaker, scoped_session  # ORM session manager
@@ -45,15 +38,15 @@ class DBStorage:
     def __init__(self):
         """Instantiates a new DBStorage object"""
         # Get environment variables
-        user = environ.get('HBNB_MYSQL_USER')
-        pwd = environ.get('HBNB_MYSQL_PWD')
-        host = environ.get('HBNB_MYSQL_HOST', default='localhost')
-        db = environ.get('HBNB_MYSQL_DB')
-        env = environ.get('HBNB_ENV')
+        user = environ.get('HBNB_MYSQL_USER')  # User name
+        pwd = environ.get('HBNB_MYSQL_PWD')  # Password
+        host = environ.get('HBNB_MYSQL_HOST', default='localhost')  # Host name
+        db = environ.get('HBNB_MYSQL_DB')  # Database type: file or db
+        env = environ.get('HBNB_ENV')  # Environment in use: test or dev
 
         # Create engine
         self.__engine = create_engine(
-                f'mysql+mysqldb://{user}:{pwd}@{host}/{db}',
+                f"mysql+mysqldb://{user}:{pwd}@{host}/{db}",
                 pool_pre_ping=True)
 
         # Drop tables if testing
@@ -111,6 +104,12 @@ class DBStorage:
         """
         Create all tables in database and current database session.
         """
+        from models.state import State
+        from models.city import City
+        from models.user import User
+        from models.place import Place
+        from models.review import Review
+        from models.amenity import Amenity
         Base.metadata.create_all(self.__engine)  # Create all tables in db
         # Create session factory
         Session = sessionmaker(bind=self.__engine, expire_on_commit=False)
