@@ -31,7 +31,7 @@ import shlex  # Availing lexical analysis functionality
 import cmd  # Availing most of the functionality for the console
 import sys  # Availing the isatty() method to determine interactive mode
 from models.base_model import BaseModel  # Availing the BaseModel class
-from models.__init__ import storage  # Availing the storage engine
+from models import storage  # Availing the storage engine
 from models.user import User  # Availing the User class
 from models.place import Place  # Availing the Place class
 from models.state import State  # Availing the State class
