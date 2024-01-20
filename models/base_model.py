@@ -18,12 +18,10 @@ from datetime import datetime
 
 storage_type = getenv("HBNB_TYPE_STORAGE")
 
-Base = None
+Base = object
 
 if storage_type == "db":  # Checking current storage-type settings
     Base = declarative_base()  # Creating base class for SQLAlchemy.
-else:
-    Base = object
 
 
 class BaseModel:
