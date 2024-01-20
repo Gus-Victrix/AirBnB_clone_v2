@@ -87,7 +87,7 @@ class BaseModel:
                 else:
                     self.updated_at = datetime.fromisoformat(
                             kwargs['updated_at'])
-
+        return
 
     def __str__(self):
         """
