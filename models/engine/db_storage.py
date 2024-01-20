@@ -104,6 +104,7 @@ class DBStorage:
         """
         Create all tables in database and current database session.
         """
+        from models.base_model import Base
         from models.state import State
         from models.city import City
         from models.user import User
