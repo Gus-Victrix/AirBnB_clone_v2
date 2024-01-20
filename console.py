@@ -189,6 +189,7 @@ class HBNBCommand(cmd.Cmd):  # Implementation of the HBNB console
 
         # Save the instance and print its id
         print(new_instance.id)
+        storage.new(new_instance)
         storage.save()
 
     def _parse_value(self, args):
