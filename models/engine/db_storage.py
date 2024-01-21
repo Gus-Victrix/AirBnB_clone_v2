@@ -113,8 +113,10 @@ class DBStorage:
         from models.amenity import Amenity
         Base.metadata.create_all(self.__engine)  # Create all tables in db
         # Create session factory
-        Session = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        self.__session = scoped_session(Session)  # Create current session
+        Session = scoped_session(sessionmaker(
+            bind=self.__engine,
+            expire_on_commit=False))
+        self.__session = Session()  # Create current session
 
     def close(self):
         """
