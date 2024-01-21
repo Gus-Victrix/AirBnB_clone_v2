@@ -5,7 +5,6 @@ State module
 from models.base_model import BaseModel, Base, storage_type
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
-from os import getenv
 
 
 class State(BaseModel, Base):
@@ -16,7 +15,7 @@ class State(BaseModel, Base):
     if storage_type == "db":
         __tablename__ = "states"
         name = Column(String(128), nullable=False)
-        cities = relationship("City", backref="state", cascade="delete")
+        cities = relationship("City", backref="state", cascade="all, delete")
     else:
         name = ""
 
