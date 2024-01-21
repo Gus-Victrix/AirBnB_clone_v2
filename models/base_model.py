@@ -39,6 +39,13 @@ class BaseModel:
         save - updates updated_at with current time when instance is changed
         to_dict - converts instance into dict format
     """
+    if storage_type == "db":  # Setting up schema for sqlalchemy
+        # Seting up id column
+        id = Column(String(60), nullable=False, primary_key=True)
+        # Setting up creation time column and updated time column
+        current_time = datetime.utcnow
+        created_at = Column(DateTime, default=current_time)
+        updated_at = Column(DateTime, default=current_time)
     def __init__(self, *args, **kwargs):
         """
         Instantiates a new BaseModel.
@@ -50,41 +57,27 @@ class BaseModel:
             created_at - time instance was created
             updated_at - time instance was updated
         """
-        if storage_type == "db":  # Setting up schema for sqlalchemy
-            # Seting up id column
-            id = Column(String(60), nullable=False, primary_key=True)
-            # Setting up creation time column and updated time column
-            current_time = datetime.utcnow
-            created_at = Column(DateTime, default=current_time)
-            updated_at = Column(DateTime, default=current_time)
+        current_time = datetime.now()  # Taking time-stamp for consistency.
+        if len(kwargs) == 0:  # If no kwargs were passsed.
+            from models import storage
+            self.id = str(uuid.uuid4())  # Generating unique id.
+            self.created_at = current_time
+            self.updated_at = current_time
+            storage.new(self)
         else:
-            current_time = datetime.now()  # Taking time-stamp for consistency.
-            if len(kwargs) == 0:  # If no kwargs were passsed.
-                from models import storage
-                self.id = str(uuid.uuid4())  # Generating unique id.
+            for key, value in kwargs.items():  # Iterating through kwargs.
+                if key != '__class__':  # Ignoring class name.
+                    setattr(self, key, value)
+            if 'id' not in kwargs.keys():
+                self.id = str(uuid.uuid4())
+            if 'created_at' not in kwargs.keys():
                 self.created_at = current_time
-                self.updated_at = current_time
-                storage.new(self)
             else:
-                for key, value in kwargs.items():  # Iterating through kwargs.
-                    if key != '__class__':  # Ignoring class name.
-                        # Setting anything that isn't a datetime object.
-                        if key != 'created_at' and key != 'updated_at':
-                            setattr(self, key, value)
-                        else:  # Setting datetime objects.
-                            setattr(self, key, datetime.fromisoformat(value))
-                if 'id' not in kwargs.keys():
-                    self.id = str(uuid.uuid4())
-                if 'created_at' not in kwargs.keys():
-                    self.created_at = current_time
-                else:
-                    self.created_at = datetime.fromisoformat(
-                            kwargs['created_at'])
-                if 'updated_at' not in kwargs.keys():
-                    self.updated_at = current_time
-                else:
-                    self.updated_at = datetime.fromisoformat(
-                            kwargs['updated_at'])
+                self.created_at = datetime.fromisoformat(self.created_at)
+            if 'updated_at' not in kwargs.keys():
+                self.updated_at = current_time
+            else:
+                self.updated_at = datetime.fromisoformat(self.updated_at)
         return
 
     def __str__(self):
