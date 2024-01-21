@@ -46,6 +46,7 @@ class BaseModel:
         current_time = datetime.utcnow
         created_at = Column(DateTime, default=current_time)
         updated_at = Column(DateTime, default=current_time)
+
     def __init__(self, *args, **kwargs):
         """
         Instantiates a new BaseModel.
