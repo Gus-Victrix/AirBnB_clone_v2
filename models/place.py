@@ -86,43 +86,43 @@ class Place(BaseModel, Base):
         longitude = 0.0
         amenity_ids = []
 
-    @property
-    def reviews(self):
-        """
-        Getter attribute in case of file storage.
+        @property
+        def reviews(self):
+            """
+            Getter attribute in case of file storage.
 
-        Returns:
-            A list of Review objects with place_id equal to the current
-            Place.id.
-        """
-        review_list = []
-        for review in models.storage.all(Review).values():
-            if review.place_id == self.id:
-                review_list.append(review)
-        return review_list
+            Returns:
+                A list of Review objects with place_id equal to the current
+                Place.id.
+            """
+            review_list = []
+            for review in models.storage.all(Review).values():
+                if review.place_id == self.id:
+                    review_list.append(review)
+            return review_list
 
-    @property
-    def amenities(self):
-        """
-        Getter attribute in case of file storage.
+        @property
+        def amenities(self):
+            """
+            Getter attribute in case of file storage.
 
-        Returns:
-            A list of Amenity objects with place_id equal to the current
-            Place.id.
-        """
-        amenity_list = []
-        for amenity in models.storage.all(Amenity).values():
-            if amenity.id in self.amenity_ids:
-                amenity_list.append(amenity)
-        return amenity_list
+            Returns:
+                A list of Amenity objects with place_id equal to the current
+                Place.id.
+            """
+            amenity_list = []
+            for amenity in models.storage.all(Amenity).values():
+                if amenity.id in self.amenity_ids:
+                    amenity_list.append(amenity)
+            return amenity_list
 
-    @amenities.setter
-    def amenities(self, obj):
-        """
-        Setter attribute in case of file storage.
+        @amenities.setter
+        def amenities(self, obj):
+            """
+            Setter attribute in case of file storage.
 
-        Args:
-            obj: An Amenity object.
-        """
-        if isinstance(obj, Amenity):
-            self.amenity_ids.append(obj.id)
+            Args:
+                obj: An Amenity object.
+            """
+            if type(obj) == Amenity:
+                self.amenity_ids.append(obj.id)
