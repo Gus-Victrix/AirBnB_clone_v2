@@ -47,3 +47,7 @@ class test_User(test_basemodel):
             self.assertEqual(new.password, None)
         else:
             self.assertEqual(type(new.password), str)
+
+
+if __name__ == "__main__":
+    unittest.main()

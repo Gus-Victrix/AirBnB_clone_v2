@@ -36,3 +36,7 @@ class test_db_storage(unittest.TestCase):
 
         module_class = len(DBStorage.__init__.__doc__)
         self.assertGreater(module_class, 0)
+
+
+if __name__ == "__main__":
+    unittest.main()
