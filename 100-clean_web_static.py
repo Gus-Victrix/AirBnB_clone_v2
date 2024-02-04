@@ -8,7 +8,7 @@ import os
 import pathlib
 from fabric.api import *
 
-env.hosts = ['34.148.245.248', '34.138.44.159']
+env.hosts = ['34.207.63.26', '100.25.109.76']
 
 
 def do_clean(number=0):
