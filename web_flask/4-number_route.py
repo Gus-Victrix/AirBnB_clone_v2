@@ -5,6 +5,7 @@ Create a route for our website
 """
 
 from flask import Flask, escape
+
 app = Flask(__name__)
 
 
@@ -43,7 +44,7 @@ def python(text='is cool'):
 
 @app.route('/number/<int:n>', strict_slashes=False)
 def hello_number(n):
-    """Return value"""
+    """Return value if int"""
     return '{} is a number'.format(n)
 
 
