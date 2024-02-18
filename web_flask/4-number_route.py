@@ -4,7 +4,7 @@
 Create a route for our website
 """
 
-from flask import Flask, escape
+from flask import Flask
 
 app = Flask(__name__)
 
