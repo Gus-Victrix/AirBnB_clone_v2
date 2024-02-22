@@ -123,3 +123,4 @@ class DBStorage:
         Close the current session.
         """
         self.__session.remove()  # Close current session
+        self.reload()  # Create new session
